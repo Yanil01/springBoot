@@ -2,7 +2,6 @@ package np.com.yanilmagar.journalApp.controller;
 
 import np.com.yanilmagar.journalApp.entity.JournalEntry;
 import np.com.yanilmagar.journalApp.service.JournalEntryService;
-import org.apache.tomcat.util.http.parser.HttpParser;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -65,8 +64,8 @@ public class JournalEntryController {
     public ResponseEntity<?> updateEntryById(@PathVariable ObjectId myId, @RequestBody JournalEntry newEntry){
         JournalEntry old = journalEntryService.findById(myId).orElse(null);
         if(old!=null){
-            old.setTitle(newEntry.getTitle() != null && !newEntry.getTitle().equals("")?newEntry.getTitle():old.getTitle());
-            old.setContent(newEntry.getContent() != null && !newEntry.getContent().equals("")?newEntry.getContent():old.getContent());
+            old.setTitle(newEntry.getTitle() != null && !newEntry.getContent().isEmpty()?newEntry.getTitle():old.getTitle());
+            old.setContent(newEntry.getContent() != null && !newEntry.getContent().isEmpty()?newEntry.getContent():old.getContent());
             journalEntryService.saveEntry(old);
             return new ResponseEntity<>(old, HttpStatus.OK);
         }
