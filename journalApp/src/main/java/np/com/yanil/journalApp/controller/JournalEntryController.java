@@ -1,41 +1,29 @@
 package np.com.yanil.journalApp.controller;
 
 import np.com.yanil.journalApp.entity.JournalEntry;
+import np.com.yanil.journalApp.service.JournalEntryService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/journal")
 public class JournalEntryController {
-    private Map<String, JournalEntry> journalEntries = new HashMap<>();
 
-    @GetMapping
-    private List<JournalEntry> getAll(){
-        return new ArrayList<>(journalEntries.values());
-    }
+   @Autowired
+   private JournalEntryService journalEntryService;
 
-    @GetMapping("/{id}")
-    private JournalEntry getById(@PathVariable String id){
-        return journalEntries.get(id);
-    }
+   @PostMapping
+    public boolean createEntry(@RequestBody JournalEntry myEntry){
+       journalEntryService.saveEntry(myEntry);
+       return true;
+   }
 
-    @PostMapping
-    private boolean createEntry(@RequestBody JournalEntry myEntry){
-        journalEntries.put(myEntry.getId(),myEntry);
-        return true ;
-    }
-
-    @DeleteMapping("/{id}")
-    private JournalEntry deleteById(@PathVariable String id){
-        return journalEntries.remove(id);
-    }
-
-    @PutMapping("/{id}")
-    private JournalEntry updateById(@PathVariable String id, @RequestBody JournalEntry myEntry){
-        return journalEntries.put(id,myEntry);
-    }
+   @GetMapping
+    public List<JournalEntry> getAll(){
+       return journalEntryService.getAllEntry();
+   }
 }
