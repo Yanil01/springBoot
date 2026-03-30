@@ -8,6 +8,7 @@ import org.apache.catalina.User;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +23,7 @@ public class JournalEntryService {
     @Autowired
     private UserEntryService userEntryService;
 
+    @Transactional
     public void saveEntry(JournalEntry journalEntry, String userName) {
         UserEntry user = userEntryService.findByUserName(userName);
         journalEntry.setDate(LocalDateTime.now());
