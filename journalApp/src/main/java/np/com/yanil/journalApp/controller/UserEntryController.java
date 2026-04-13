@@ -2,15 +2,18 @@ package np.com.yanil.journalApp.controller;
 
 
 import np.com.yanil.journalApp.entity.UserEntry;
+import np.com.yanil.journalApp.repository.UserEntryRepository;
 import np.com.yanil.journalApp.service.UserEntryService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.util.ArrayList;
+
 
 
 import java.util.List;
@@ -22,6 +25,9 @@ public class UserEntryController {
 
     @Autowired
     private UserEntryService userEntryService;
+
+    @Autowired
+    private UserEntryRepository userEntryRepository;
 
     @GetMapping
     public ResponseEntity<?> getUsers(){
@@ -43,16 +49,14 @@ public class UserEntryController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody UserEntry user){
-        userEntryService.saveEntry(user);
-        return new ResponseEntity<>(HttpStatus.CREATED);
 
-    }
 
-    @PutMapping("/{username}")
-    public ResponseEntity<UserEntry> updateById(@PathVariable String username,
+    @PutMapping
+    public ResponseEntity<UserEntry> updateById(
                                                 @RequestBody UserEntry newUser) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        assert authentication != null;
+        String username = authentication.getName();
         UserEntry user = userEntryService.findByUserName(username);
 
         if (user == null) {
@@ -65,5 +69,12 @@ public class UserEntryController {
         userEntryService.saveEntry(user);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?>deleteById(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        userEntryRepository.deleteUserEntriesByUserName(authentication.getName());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
