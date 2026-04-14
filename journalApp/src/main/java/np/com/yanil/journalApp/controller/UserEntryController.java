@@ -5,7 +5,7 @@ import np.com.yanil.journalApp.entity.UserEntry;
 import np.com.yanil.journalApp.repository.UserEntryRepository;
 import np.com.yanil.journalApp.service.UserEntryService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,33 +16,29 @@ import org.springframework.web.bind.annotation.*;
 
 
 
-import java.util.List;
+
 
 
 @RestController
 @RequestMapping("/users")
 public class UserEntryController {
 
-    @Autowired
-    private UserEntryService userEntryService;
+    private final UserEntryService userEntryService;
 
-    @Autowired
-    private UserEntryRepository userEntryRepository;
+    private final UserEntryRepository userEntryRepository;
 
-    @GetMapping
-    public ResponseEntity<?> getUsers(){
-        List<UserEntry> user = userEntryService.getAllEntry();
-        if (user!= null && !user.isEmpty()){
-            return new ResponseEntity<>(userEntryService.getAllEntry(), HttpStatus.FOUND);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
+    public UserEntryController(UserEntryService userEntryService, UserEntryRepository userEntryRepository) {
+        this.userEntryService = userEntryService;
+        this.userEntryRepository = userEntryRepository;
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<UserEntry> getUserById(@PathVariable String username){
-        UserEntry user =  userEntryService.findByUserName(username);
 
+    @GetMapping
+    public ResponseEntity<UserEntry> getUserById(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        assert authentication != null;
+        String username = authentication.getName();
+        UserEntry user = userEntryService.findByUserName(username);
         if (user != null){
             return new ResponseEntity<>(user, HttpStatus.FOUND);
         }
@@ -66,7 +62,7 @@ public class UserEntryController {
         user.setUserName(newUser.getUserName());
         user.setUserPassword(newUser.getUserPassword());
 
-        userEntryService.saveEntry(user);
+        userEntryService.saveNewEntry(user);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -74,6 +70,7 @@ public class UserEntryController {
     @DeleteMapping
     public ResponseEntity<?>deleteById(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        assert authentication != null;
         userEntryRepository.deleteUserEntriesByUserName(authentication.getName());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
