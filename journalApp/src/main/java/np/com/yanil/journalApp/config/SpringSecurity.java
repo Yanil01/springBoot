@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,10 +29,10 @@ public class SpringSecurity {
 
         http
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/journal/**","/users/**").authenticated()
-                        .requestMatchers("/admin/users").hasRole("ADMIN")
+                        .requestMatchers("/admin/users","/admin/journals").hasAnyRole("ADMIN","SUPER")
                         .requestMatchers("/admin/**").hasRole("SUPER")
                         .anyRequest().permitAll()
                 )
