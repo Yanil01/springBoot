@@ -31,6 +31,8 @@ public class SpringSecurity {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/journal/**","/users/**").authenticated()
+                        .requestMatchers("/admin/users").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("SUPER")
                         .anyRequest().permitAll()
                 )
                 .userDetailsService(userDetailsServiceImp)
