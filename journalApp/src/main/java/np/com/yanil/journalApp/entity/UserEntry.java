@@ -1,6 +1,7 @@
 package np.com.yanil.journalApp.entity;
 
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Document(collection = "user_entries")
 @Data
+@Builder
 public class UserEntry {
     @Id
     private ObjectId userId;
